@@ -10,13 +10,12 @@ private:
 	int inc, i, j;
 public:
 	Orden() = default;
-	void shellSort(float*, int);
-	void mostrar(float*, int);
+	float* shellSort(float*, int);
 
 };
 
 
-void Orden::shellSort(float* V, int N) {
+float* Orden::shellSort(float* V, int N) {
 
 	for (inc = 1; inc < N; inc = inc * 3 + 1);
 
@@ -33,14 +32,5 @@ void Orden::shellSort(float* V, int N) {
 		inc /= 2;
 	}
 
-	mostrar(V, N);
-
-}
-
-void Orden::mostrar(float* V, int N) {
-
-	for (int i = N - 1; i >= 0; i--) {
-		cout << *(V + i) << " ";
-	}
-	cout << endl;
+	return V;
 }

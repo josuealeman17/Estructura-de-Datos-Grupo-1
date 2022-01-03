@@ -11,5 +11,6 @@ class ListaAlumno : public Lista<Alumno> {
 		void mediaClase();
 		void mediaAlumnos();
 		void ordenar();
+		void sort();
 		
 };

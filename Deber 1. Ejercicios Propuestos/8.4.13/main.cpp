@@ -7,15 +7,14 @@
 using namespace std;
 
 
-void menuAlumnos(int&);
-void menuAsignaturas(int&);
-
 int main(int argv, char** argc) {
 
 
 	cout << "EJERCICIO 8.4.13" << endl;
 	cout << "COLEGIO LOS TIGRES TAMBIEN LLORAN" << endl;
-	
+	system("pause");
+	system("cls");
+
 	ListaAlumno alumnos;
 
 
@@ -25,7 +24,7 @@ int main(int argv, char** argc) {
 		cout << "1. Alumnos" << endl;
 		cout << "2. Asignaturas" << endl;
 		cout << "3. Salir" << endl; cin >> opc;
-
+		system("cls");
 		switch (opc) {
 
 			case 1:
@@ -38,6 +37,7 @@ int main(int argv, char** argc) {
 					cout << "4. Ver media de la clase" << endl;
 					cout << "5. Ordenar alumnos" << endl;
 					cout << "6. Regresar" << endl; cin >> alumn;
+					system("cls");
 					if (alumn == 1) {
 						cout << "Cuantos alumnos vas a ingresar?"; cin >> dim;
 						Alumno alumno;
@@ -51,7 +51,10 @@ int main(int argv, char** argc) {
 					if (alumn == 3) alumnos.mediaAlumnos();
 					if (alumn == 4) alumnos.mediaClase();
 					if (alumn == 5) alumnos.ordenar();
+					system("pause");
+					system("cls");
 				} while (alumn != 6);
+
 				break;
 
 			case 2:
@@ -61,6 +64,8 @@ int main(int argv, char** argc) {
 					cout << "2. Regresar" << endl; cin >> asig;
 					if (asig == 1) alumnos.mediaAsignaturas();
 				} while (asig != 2);
+				system("pause");
+				system("cls");
 				break;
 			case 3:
 				exit(0);
@@ -68,31 +73,7 @@ int main(int argv, char** argc) {
 
 	} while (opc != 3);
 
-
-
 	return 0;
 
 }
 
-
-void menuAlumnos(int& opc) {
-
-	do {
-		cout << "1. Ingresar alumnos" << endl;
-		cout << "2. Ver lista de alumnos" << endl;
-		cout << "3. Regresar" << endl; cin >> opc;
-		if (opc == 1) menuAlumnos(opc);
-		if (opc == 2) menuAsignaturas(opc);
-		if (opc == 3) return;
-	} while (opc != 3);
-
-}
-void menuAsignaturas(int& opc){
-	do {
-		cout << "1. Ver Media" << endl;
-		cout << "2. Regresar" << endl; cin >> opc;
-		if (opc == 1) menuAlumnos(opc);
-		if (opc == 2) return;
-	} while (opc != 3);
-
-}

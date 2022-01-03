@@ -34,6 +34,7 @@ void Alumno::ingresarNotas() {
 	}
 
 	this->notas = _notas;
+	system("cls");
 }
 
 float Alumno::calcularMedia() {

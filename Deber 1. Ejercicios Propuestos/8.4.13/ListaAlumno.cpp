@@ -105,6 +105,17 @@ void ListaAlumno::ordenar()
 		*(notasIndividuales + i) = p->dato.calcularMedia();
 		p = p->siguiente;
 	}
-
-	orden.shellSort(notasIndividuales, size);
+	notasIndividuales = orden.shellSort(notasIndividuales, size);
+	
+	p = primero;
+	for (int i = size - 1; i >= 0; i--) {
+		for (int j = 0; j < size; j++) {
+			if (*(notasIndividuales + i) == p->dato.calcularMedia()) {
+				cout << "Estudiante: " << p->dato.getNombre() << endl << "Nota: " << *(notasIndividuales + i) << endl << endl;
+				break;
+			} 
+			p = p->siguiente;
+		}
+		p = primero;
+	}
 }
