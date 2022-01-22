@@ -1,17 +1,18 @@
 #include "Expresion.h"
-#include "Token.h"
 
-Funcion::RPN Expresion::notacionPolacaInversa(string str)
+
+funct::RPN Expresion::notacionPolacaInversa(const char* eqn)
 {
-	std::vector<std::string> queue;
-	std::stack<std::string> stack;
 
-	std::string obj = "";
-	TokenTypes type = TokenTypes::ELSE;
-	TokenTypes prevType = TokenTypes::ELSE; // negative sign detection
+	vector<string> queue;
+	stack<string> stack;
 
-	bool acceptDecimal = true;
-	bool acceptNegative = true;
+	string obj = "";
+	TokenTipos type = TokenTipos::otro;
+	TokenTipos prevType = TokenTipos::otro; // negative sign detection
+
+	bool aceptaDecimal = true;
+	bool aceptaNegativo = true;
 
 	// token reading and detection
 	for (int i = 0, eqLen = (int)strlen(eqn); i < eqLen; i++) {
@@ -24,58 +25,58 @@ Funcion::RPN Expresion::notacionPolacaInversa(string str)
 		}
 
 		// classify token
-		if (isNumber(t)) {
-			type = TokenTypes::CONSTANT;
+		if (Utilidades::esNumero(t)) {
+			type = TokenTipos::constante;
 			if (t == '.') {
-				acceptDecimal = false;
+				aceptaDecimal = false;
 			}
 			else if (t == '-') {
-				acceptNegative = false;
+				aceptaNegativo = false;
 			}
 
 			int startI = i;
 			if (i < eqLen - 1) {
-				while (isNumber(eqn[i + 1], acceptDecimal, acceptNegative)) {
+				while (Utilidades::esNumero(eqn[i + 1], aceptaDecimal, aceptaNegativo)) {
 					i++;
 					if (i >= eqLen - 1) {
 						break;
 					}
 				}
 			}
-			obj = std::string(eqn).substr(startI, i - startI + 1);
+			obj = string(eqn).substr(startI, i - startI + 1);
 
 			// subtraction sign detection
 			if (obj == "-") {
-				type = TokenTypes::OPERATOR;
+				type = TokenTipos::operador;
 			}
 		}
 		else {
-			obj = findElement(i, eqn, functionNames);
+			obj = Utilidades::buscarElemento(i, eqn, expdef::funciones);
 			if (obj != "") {
 				// found valid object
-				type = contains<char>(operators, obj[0]) ? TokenTypes::OPERATOR : TokenTypes::FUNCTION;
+				type = Utilidades::estaVacio<char>(expdef::operadores, obj[0]) ? TokenTipos::operador : TokenTipos::funcion;
 			}
 			else {
-				obj = findElement(i, eqn, constantNames);
+				obj = Utilidades::buscarElemento(i, eqn, expdef::nombreConstantes);
 				if (obj != "") {
 					// found valid object
-					type = TokenTypes::CONSTANT;
+					type = TokenTipos::constante;
 				}
 				else {
-					obj = findElement(i, eqn, keys<double>(variables));
+					obj = Utilidades::buscarElemento(i, eqn, Utilidades::llaves<double>(expdef::variables));
 					if (obj != "") {
-						type = TokenTypes::CONSTANT;
+						type = TokenTipos::constante;
 					}
-					else if (contains<char>(leftBrackets, t)) {
-						type = TokenTypes::LPAREN;
+					else if (Utilidades::estaVacio<char>(expdef::izqParenteris, t)) {
+						type = TokenTipos::parenIzq;
 						obj = "(";
 					}
-					else if (contains<char>(rightBrackets, t)) {
-						type = TokenTypes::RPAREN;
+					else if (Utilidades::estaVacio<char>(expdef::derParentesis, t)) {
+						type = TokenTipos::parenDer;
 						obj = ")";
 					}
 					else {
-						type = TokenTypes::ELSE;
+						type = TokenTipos::otro;
 					}
 				}
 			}
@@ -85,54 +86,39 @@ Funcion::RPN Expresion::notacionPolacaInversa(string str)
 		// do something with the token
 		const char* last_stack = (stack.size() > 0) ? stack.top().c_str() : "";
 		switch (type) {
-		case TokenTypes::CONSTANT:
+		case TokenTipos::constante:
 			queue.push_back(obj);
 			break;
-		case TokenTypes::FUNCTION:
+		case TokenTipos::funcion:
 			stack.push(obj);
 			break;
-		case TokenTypes::OPERATOR:
+		case TokenTipos::operador:
 			if (stack.size() != 0) {
-				while (
-					/*
-						stk = stack top = last_stack
-						obj = obj
-									stk is a function
-								AND
-									stk is not an operator
-							OR
-								stk has a higher precedence than obj
-							OR
-									they have equal precedence
-								AND
-									stk is left associative
-						AND
-							stk is not a left bracket
-					*/
-					(
-						(contains<std::string>(functionNames, last_stack) &&
-							!contains<char>(operators, last_stack[0])) ||
-						getPrecedence(last_stack) > getPrecedence(obj) ||
-						((getPrecedence(last_stack) == getPrecedence(obj)) &&
-							isLeftAssociative(last_stack))
-						) &&
-					!contains<char>(leftBrackets, last_stack[0])
-					) {
-					// pop from the stack to the queue
-					queue.push_back(stack.top());
-					stack.pop();
-					if (stack.size() == 0) {
-						break;
+				while (((Utilidades::estaVacio<string>(expdef::funciones, last_stack) &&
+							!Utilidades::estaVacio<char>(expdef::operadores, last_stack[0])) ||
+								funct::getJerarquia(last_stack) > funct::getJerarquia(obj) ||
+									((funct::getJerarquia(last_stack) == funct::getJerarquia(obj)) &&
+										funct::esAsociativaIzq(last_stack))
+							) && (!Utilidades::estaVacio<char>(expdef::izqParenteris, last_stack[0]))) {
+
+
+								queue.push_back(stack.top());
+								stack.pop();
+
+								if (stack.size() == 0) {
+									break;
+
 					}
+
 					last_stack = stack.top().c_str();
 				}
 			}
 			stack.push(obj);
 			break;
-		case TokenTypes::LPAREN:
+		case TokenTipos::parenIzq:
 			stack.push(obj);
 			break;
-		case TokenTypes::RPAREN:
+		case TokenTipos::parenDer:
 			while (last_stack[0] != '(') {
 				// pop from the stack to the queue
 				queue.push_back(stack.top());
@@ -156,4 +142,65 @@ Funcion::RPN Expresion::notacionPolacaInversa(string str)
 	}
 
 	return queue;
+}
+
+Nodo::Nodo* Expresion::pasar(funct::RPN rpn)
+{
+
+	stack<Nodo::Nodo*> stack;
+
+	for (string item : rpn) {
+		if (Utilidades::esNumero(item.c_str())) {
+			// push number node
+			stack.push(new Nodo::NodoNumero(item));
+		}
+		else {
+			// function
+			Nodo::NodoFunc* f = new Nodo::NodoFunc(item);
+			if (Utilidades::estaVacio<string>(expdef::funciones_binarias, item)) {
+				f->setUnaria(false);
+				// set children of node
+
+				// right child is second argument
+				f->derecha = stack.top();
+				stack.pop();
+
+				// left child is first argument
+				f->izquierda = stack.top();
+				stack.pop();
+			}
+			else if (Utilidades::estaVacio<string>(expdef::funciones_unarias, item)) {
+				f->setUnaria(true);
+				// set child of node
+				f->izquierda = stack.top();
+				stack.pop();
+			}
+			stack.push(f);
+		}
+	}
+
+	if (stack.size() == 0) {
+		return nullptr;
+	}
+
+	return stack.top();
+}
+
+double Expresion::evaluarArbol(Nodo::Nodo* arbol)
+{
+	if (arbol->esFuncion) {
+		Nodo::NodoFunc* ftree = (Nodo::NodoFunc*)arbol;
+		if (ftree->esUnaria) {
+			// evaluate child recursively and then evaluate with return value
+			return ftree->eval(evaluarArbol(arbol->izquierda));
+		}
+		else {
+			// evaluate each child recursively and then evaluate with return value
+			return ftree->eval(evaluarArbol(arbol->izquierda), evaluarArbol(arbol->derecha));
+		}
+	}
+	else {
+		// number node
+		return ((Nodo::NodoNumero*)arbol)->eval();
+	}
 }

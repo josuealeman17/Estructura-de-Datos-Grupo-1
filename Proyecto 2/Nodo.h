@@ -9,50 +9,50 @@
 
 using namespace std;
 
+
 namespace Nodo {
 
 	class Nodo
 	{
-	public:
-		Nodo(string nombre, bool esFuncion)
-			: nombre(nombre), esFuncion(esFuncion) {}
+		public:
+			Nodo(string nombre, bool esFuncion)
+				: nombre(nombre), esFuncion(esFuncion) {}
 
-		double eval(double x = 0, double y = 0);
-		string nombre;
-		bool esFuncion;
-		Nodo* derecha;
-		Nodo* izquierda;
+			double eval(double x = 0, double y = 0);
+			string nombre;
+			bool esFuncion;
+			Nodo* derecha;
+			Nodo* izquierda;
 	};
 
 	class NodoFunc : public Nodo {
 		public:
 			NodoFunc(string nombre)
-				:Nodo(nombre, true){}
+				:Nodo(nombre, true) {}
 
 			void setUnaria(bool esUnaria) {
 				this->esUnaria = esUnaria;
-				this->func = esUnaria ? Funcion::funciones_unarias[nombre] : Funcion::funciones_binarias[nombre];
+				this->func = esUnaria ? funct::funciones_unarias.at(nombre) : funct::funciones_binarias.at(nombre);
 			}
 
 			double eval(double x, double y = 0) {
 				return this->func.eval(x, y);
 			}
 
-			bool esUnaria;
-			Funcion::Funcion func;
+		bool esUnaria;
+		funct::Funcion func;
 	};
 
 
 	class NodoNumero : public Nodo {
-	public:
-		NodoNumero(string nombre)
-			: Nodo(nombre, false){}
+		public:
+			NodoNumero(string nombre)
+				: Nodo(nombre, false){}
 
-		double eval(double x = 0, double y = 0) {
-			return utils.getValorNumerico(nombre.c_str());
-		}
+			double eval(double x = 0, double y = 0) {
+				return Utilidades::getValorNumerico(nombre.c_str());
+			}
 
-		Utilidades utils;
 	};
 
 }

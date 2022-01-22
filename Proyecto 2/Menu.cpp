@@ -1,4 +1,13 @@
 #include "Menu.h"
+#include "Expresion.h"
+#include "Funcion.h"
+#include "Nodo.h"
+#include <vector>
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
 
 void Menu::imprimir() {
 
@@ -11,6 +20,8 @@ void Menu::imprimir() {
 		cout << "2. PRE-FIJA" << endl;
 		cout << "3. POST-FIJA" << endl;
 		cout << "4. SALIR" << endl; cin >> opc;
+		cin.clear();
+		cin.ignore(9999,'\n');
 
 		switch (opc) {
 			case 1:
@@ -36,9 +47,18 @@ void Menu::imprimir() {
 }
 
 void Menu::ingresarIn(string expresion) {
+	Expresion exp;
+	
+	cout << "Ingresando en INFIJA" << endl;
+	getline(std::cin, expresion);
 
+	funct::RPN rpn = exp.notacionPolacaInversa(expresion.c_str());
 
-	cout << "Ingresando en INFIJA" << endl; cin >> expresion;
+	Nodo::Nodo* nodo = exp.pasar(rpn);
+	double result = exp.evaluarArbol(nodo);
+
+	cout << result;
+	cout << endl;
 
 
 	system("pause");
@@ -55,7 +75,22 @@ void Menu::ingresarPre(string expresion) {
 
 void Menu::ingresarPost(string expresion) {
 
-	cout << "Ingresando en POSTFIJA" << endl; cin >> expresion;
+	Expresion exp;
+	funct::RPN rpn;
+
+	cout << "Ingresando en POSTFIJA" << endl; 
+	getline(cin, expresion);
+	stringstream ss(expresion);
+	string token;
+
+	while (getline(ss, token, ' ')) {
+
+		rpn.push_back(token);
+	}
+	Nodo::Nodo* nodo = exp.pasar(rpn);
+	double result = exp.evaluarArbol(nodo);
+
+
 	system("pause");
 	system("cls");
 }
